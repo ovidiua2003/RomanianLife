@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useGameStore } from '../store/useGameStore'
 
 const StatsPanel: React.FC = () => {
-  const { money, totalXP, age, energy, prestigeCount, reset } = useGameStore()
+  const { money, totalXP, ageDays, ageYears, energy, prestigeCount, reset } = useGameStore()
   const [maneleOn, setManeleOn] = useState(false)
 
   return (
@@ -11,7 +11,7 @@ const StatsPanel: React.FC = () => {
       <ul className="text-sm space-y-1">
         <li>💰 Bani: {money.toFixed(2)} RON</li>
         <li>🧠 XP Total: {totalXP.toFixed(1)}</li>
-        <li>📅 Vârstă: {age} ani</li>
+        <li>📅 Vârstă: {ageYears} ani și {ageDays} zile</li>
         <li>⚡ Energie: {energy}%</li>
         <li>🔁 Prestigii: {prestigeCount}</li>
       </ul>

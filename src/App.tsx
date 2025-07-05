@@ -15,7 +15,7 @@ const App: React.FC = () => {
     load()
     const interval = setInterval(() => {
       tick()
-    }, 1000)
+    }, 500)
     return () => clearInterval(interval)
   }, [tick, load])
 

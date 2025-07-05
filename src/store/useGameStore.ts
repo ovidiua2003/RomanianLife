@@ -33,7 +33,8 @@ type Job = {
 
 type GameState = {
   money: number
-  age: number
+  ageYears: number
+  ageDays: number
   energy: number
   totalXP: number
   xpMultiplier: number
@@ -56,7 +57,8 @@ type GameState = {
 export const useGameStore = create<GameState>((set, get) => {
   const initialState = {
     money: 0,
-    age: 16,
+    ageYears: 17,
+    ageDays: 0,
     energy: 100,
     totalXP: 0,
     xpMultiplier: 1,
@@ -88,8 +90,13 @@ export const useGameStore = create<GameState>((set, get) => {
     ...initialState,
     tick: () => {
       const state = get()
-      let { money, totalXP, skills, jobs } = state
+      let { money, totalXP, skills, jobs, ageYears, ageDays } = state
       const xpBoost = state.xpMultiplier * state.happinessMultiplier
+      ageDays += 1
+      if (ageDays >= 365) {
+        ageYears += 1
+        ageDays = 0
+      }
 
       // Auto-unlock skills
       skills = skills.map(skill => {
@@ -140,7 +147,7 @@ export const useGameStore = create<GameState>((set, get) => {
         set({ eventLog: [...log.slice(-9), event.text] })
       }
 
-      set({ money, totalXP, skills, jobs })
+      set({ money, totalXP, skills, jobs, ageYears, ageDays })
       state.save()
     },
     queueSkill: (id: string) => {
@@ -164,13 +171,35 @@ export const useGameStore = create<GameState>((set, get) => {
     },
     prestige: () => {
       const state = get()
-      const newMultiplier = state.xpMultiplier + 0.5
-      const newCount = state.prestigeCount + 1
-      localStorage.removeItem(STORAGE_KEY)
+
+      // Reset skills
+      const resetSkills = state.skills.map(skill => ({
+        ...skill,
+        level: 1,
+        xp: 0,
+        isTraining: false,
+        isUnlocked: skill.id === 'english' // keep only base skill unlocked
+      }))
+
+      // Reset jobs
+      const resetJobs = state.jobs.map(job => ({
+        ...job,
+        level: 1,
+        xp: 0,
+        isWorking: false,
+        isUnlocked: job.id === 'janitor'
+      }))
+
       set({
-        ...initialState,
-        xpMultiplier: newMultiplier,
-        prestigeCount: newCount,
+        money: 0,
+        ageYears: 17,
+        ageDays: 0,
+        totalXP: 0,
+        skills: resetSkills,
+        jobs: resetJobs,
+        prestigeCount: state.prestigeCount + 1,
+        xpMultiplier: 1 + (state.prestigeCount + 1) * 0.25,
+        eventLog: [`Ai renăscut! Bonus XP: x${(1 + (state.prestigeCount + 1) * 0.25).toFixed(2)}`]
       })
     },
     save,
