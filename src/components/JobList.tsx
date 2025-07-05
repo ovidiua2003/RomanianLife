@@ -31,7 +31,7 @@ const JobList: React.FC = () => {
                     <div>
                       <p className="font-medium">{job.name}</p>
                       <p className="text-xs text-gray-500">
-                        {job.income.toFixed(0)} RON/oră • Nivel: {job.level} • XP: {job.xp.toFixed(1)}<br />
+                        {job.income.toFixed(0)} RON/zi • Nivel: {job.level} • XP: {job.xp.toFixed(1)}<br />
                         Necesită {skills.find(s => s.id === job.requiredSkill)?.name || job.requiredSkill} lvl {job.requiredLevel}
                       </p>
                     </div>

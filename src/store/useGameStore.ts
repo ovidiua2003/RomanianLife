@@ -31,8 +31,21 @@ type Job = {
   xp: number
 }
 
+type ShopItem = {
+  id: string
+  name: string
+  cost: number
+  bonus: number
+  maxPurchases?: number
+  recurringCost?: number
+  category?: 'vehicle' | 'home' | 'lifestyle' | 'consumable'
+  resaleValue?: number // e.g. 0.5 = 50% refund
+}
+
 type GameState = {
   money: number
+  incomePerTick: number,
+  expensesPerTick: number,
   ageYears: number
   ageDays: number
   energy: number
@@ -43,8 +56,9 @@ type GameState = {
   jobs: Job[]
   eventLog: string[]
   happinessMultiplier: number
-  purchasedItems: string[]
+  purchasedItems: Record<string, number>
   buyItem: (id: string) => void
+  sellItem: (id: string) => void
   tick: () => void
   queueSkill: (id: string) => void
   queueJob: (id: string) => void
@@ -57,6 +71,8 @@ type GameState = {
 export const useGameStore = create<GameState>((set, get) => {
   const initialState = {
     money: 0,
+    incomePerTick: 0,
+    expensesPerTick: 0,
     ageYears: 17,
     ageDays: 0,
     energy: 100,
@@ -92,6 +108,9 @@ export const useGameStore = create<GameState>((set, get) => {
       const state = get()
       let { money, totalXP, skills, jobs, ageYears, ageDays } = state
       const xpBoost = state.xpMultiplier * state.happinessMultiplier
+      let income = 0
+      let expenses = 0
+
       ageDays += 1
       if (ageDays >= 365) {
         ageYears += 1
@@ -106,6 +125,13 @@ export const useGameStore = create<GameState>((set, get) => {
         return skill
       })
 
+      shopItems.forEach(item => {
+        const owned = state.purchasedItems[item.id] || 0
+        if (owned && item.recurringCost) {
+          expenses += item.recurringCost
+        }
+      })
+
       // Apply job income
       jobs.forEach(job => {
         const skill = skills.find(s => s.id === job.requiredSkill)
@@ -116,12 +142,21 @@ export const useGameStore = create<GameState>((set, get) => {
 
         if (job.isWorking && job.isUnlocked) {
           const xpBoost = state.xpMultiplier * state.happinessMultiplier
-          const newXP = job.xp + job.xpPerSecond * xpBoost
-          const newLevel = Math.floor(newXP / 10) + 1
-          const incomeBoost = 1 + (newLevel - 1) * 0.05 // +5% per level
+          // 🔍 Get the required skill and its level
+          const requiredSkill = state.skills.find(s => s.id === job.requiredSkill)
+          const skillLevel = requiredSkill?.level || 1
 
-          money += job.income * incomeBoost
-          totalXP += job.xpPerSecond * xpBoost
+          // 📈 Scale job XP gain based on skill level (+5% per level above 1)
+          const skillMultiplier = 1 + (skillLevel - 1) * 0.5
+
+          const newXP = job.xp + job.xpPerSecond * xpBoost * skillMultiplier
+          const newLevel = Math.floor(newXP / 10) + 1
+          const incomeBoost = 1 + (newLevel - 1) * 0.05
+          const jobIncome = (job.income / 10) * incomeBoost
+          income += jobIncome
+
+          money += income - expenses
+          totalXP += job.xpPerSecond * xpBoost * skillMultiplier
 
           job.xp = newXP
           job.level = newLevel
@@ -147,7 +182,7 @@ export const useGameStore = create<GameState>((set, get) => {
         set({ eventLog: [...log.slice(-9), event.text] })
       }
 
-      set({ money, totalXP, skills, jobs, ageYears, ageDays })
+      set({ money, incomePerTick: income, expensesPerTick: expenses, totalXP, skills, jobs, ageYears, ageDays })
       state.save()
     },
     queueSkill: (id: string) => {
@@ -192,6 +227,8 @@ export const useGameStore = create<GameState>((set, get) => {
 
       set({
         money: 0,
+        incomePerTick: 0,
+        expensesPerTick: 0,
         ageYears: 17,
         ageDays: 0,
         totalXP: 0,
@@ -224,12 +261,47 @@ export const useGameStore = create<GameState>((set, get) => {
     buyItem: (id) => {
       const state = get()
       const item = shopItems.find(i => i.id === id)
-      if (!item || state.money < item.cost || state.purchasedItems.includes(id)) return
+      if (!item) return
+
+      const owned = state.purchasedItems[id] || 0
+      const isRepeatable = item.maxPurchases === undefined || owned < item.maxPurchases
+      const exclusiveCategories = ['vehicle', 'home']
+
+      // Prevent multiple in same category (e.g. cars)
+      const categoryConflict =
+        exclusiveCategories.includes(item.category || '') &&
+        Object.entries(state.purchasedItems).some(([otherId, qty]) => {
+          const other = shopItems.find(i => i.id === otherId)
+          return other?.category === item.category && otherId !== id && qty > 0
+        })
+
+      if (state.money < item.cost || !isRepeatable || categoryConflict) return
 
       set({
         money: state.money - item.cost,
         happinessMultiplier: state.happinessMultiplier + item.bonus,
-        purchasedItems: [...state.purchasedItems, id]
+        purchasedItems: {
+          ...state.purchasedItems,
+          [id]: owned + 1
+        }
+      })
+    },
+    sellItem: (id) => {
+      const state = get()
+      const item = shopItems.find(i => i.id === id)
+      const owned = state.purchasedItems[id] || 0
+      if (!item || owned <= 0 || !item.resaleValue) return
+
+      const refund = item.cost * item.resaleValue
+      const newQty = owned - 1
+
+      set({
+        money: state.money + refund,
+        happinessMultiplier: state.happinessMultiplier - item.bonus,
+        purchasedItems: {
+          ...state.purchasedItems,
+          [id]: newQty
+        }
       })
     }
   }

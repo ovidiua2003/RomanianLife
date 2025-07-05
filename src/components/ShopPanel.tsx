@@ -7,6 +7,7 @@ const ShopPanel: React.FC = () => {
   const happiness = useGameStore(state => state.happinessMultiplier)
   const purchased = useGameStore(state => state.purchasedItems)
   const buyItem = useGameStore(state => state.buyItem)
+  const sellItem = useGameStore(state => state.sellItem)
 
   return (
     <div className="bg-white p-4 rounded shadow border-l-4 border-pink-500 mt-6">
@@ -17,21 +18,34 @@ const ShopPanel: React.FC = () => {
           <li key={item.id} className="flex justify-between items-center">
             <div>
               <p className="font-medium">{item.name}</p>
-              <p className="text-xs text-gray-500">+{(item.bonus * 100).toFixed(0)}% fericire • {item.cost} RON</p>
+              <p className="text-xs text-gray-500">
+                +{(item.bonus * 100).toFixed(0)}% fericire • {item.cost} RON
+                {item.recurringCost && <> • 📉 {item.recurringCost} RON/tick</>}
+                {item.maxPurchases && <> • {purchased[item.id] || 0}/{item.maxPurchases}</>}
+              </p>
             </div>
-            <button
-              onClick={() => buyItem(item.id)}
-              disabled={purchased.includes(item.id) || money < item.cost}
-              className={`px-2 py-1 rounded text-xs ${
-                purchased.includes(item.id)
-                  ? 'bg-gray-400'
-                  : money >= item.cost
-                  ? 'bg-pink-600 hover:bg-pink-700'
-                  : 'bg-gray-300'
-              } text-white`}
-            >
-              {purchased.includes(item.id) ? 'Cumpărat' : 'Cumpără'}
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => buyItem(item.id)}
+                disabled={money < item.cost || (item.maxPurchases && (purchased[item.id] || 0) >= item.maxPurchases)}
+                className={`px-2 py-1 rounded text-xs text-white ${
+                money < item.cost
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-pink-600 hover:bg-pink-700'
+              }`}
+              >
+                Cumpără
+              </button>
+
+              {purchased[item.id] > 0 && item.resaleValue && (
+                <button
+                  onClick={() => sellItem(item.id)}
+                  className="px-2 py-1 rounded text-xs bg-gray-300 hover:bg-gray-400 text-black"
+                >
+                  Vinde
+                </button>
+              )}
+            </div>
           </li>
         ))}
       </ul>
