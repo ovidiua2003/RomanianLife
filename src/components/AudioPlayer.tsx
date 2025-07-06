@@ -71,23 +71,23 @@ const AudioPlayer = () => {
   }, [currentTrack])
 
   return (
-    <div className="flex space-x-1 items-center">
+    <div className="flex space-x-1 items-center justify-center">
       <audio ref={audioRef} preload="auto" />
       <button onClick={handlePrev} className="px-2 py-1">
-        <ArrowLeftEndOnRectangleIcon className="size-6 text-blue-500" />
+        <ArrowLeftEndOnRectangleIcon className="size-8 md:size-6 text-blue-500" />
       </button>
       <button onClick={handlePlayPause} className="px-2 py-1">
         {isPlaying ? (
-          <PauseIcon className="size-6 text-blue-500" />
+          <PauseIcon className="size-8 md:size-6 text-blue-500" />
         ) : (
-          <PlayIcon className="size-6 text-blue-500" />
+          <PlayIcon className="size-8 md:size-6 text-blue-500" />
         )}
       </button>
       <button onClick={handleStop} className="px-2 py-1">
-        <StopIcon className="size-6 text-blue-500" />
+        <StopIcon className="size-8 md:size-6 text-blue-500" />
       </button>
       <button onClick={handleNext} className="px-2 py-1">
-        <ArrowRightEndOnRectangleIcon className="size-6 text-blue-500" />
+        <ArrowRightEndOnRectangleIcon className="size-8 md:size-6 text-blue-500" />
       </button>
     </div>
   )
