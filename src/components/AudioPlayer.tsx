@@ -6,6 +6,7 @@ import {
   StopIcon,
   PauseIcon
 } from '@heroicons/react/24/outline'
+import { isMobile } from '../util/device'
 
 const songList = [
   './RomaniaGame.mp3',
@@ -45,11 +46,21 @@ const AudioPlayer = () => {
   const handleNext = () => {
     const next = (currentTrack + 1) % songList.length
     setCurrentTrack(next)
+
+    if (isMobile()) {
+      audioRef.current?.pause()
+      setIsPlaying(false)
+    }
   }
 
   const handlePrev = () => {
     const prev = (currentTrack - 1 + songList.length) % songList.length
     setCurrentTrack(prev)
+
+    if (isMobile()) {
+      audioRef.current?.pause()
+      setIsPlaying(false)
+    }
   }
 
   useEffect(() => {

@@ -29,7 +29,7 @@ const ShopPanel: React.FC = () => {
 
               <div className="text-sm text-gray-400 space-y-1">
                 <p className="flex flex-wrap justify-start items-center gap-2"><GiftIcon className="size-4 text-orange-400" /> Bonus: +{(item.bonus * 100).toFixed(0)}% fericire</p>
-                {item.recurringCost && <p className="flex flex-wrap justify-start items-center gap-2"><ArrowTrendingDownIcon className="size-4 text-white-800" /> Cost recurent: {item.recurringCost} RON/tick</p>}
+                {item.recurringCost && <p className="flex flex-wrap justify-start items-center gap-2"><ArrowTrendingDownIcon className="size-4 text-white-800" /> Cost recurent: {item.recurringCost} RON/zi</p>}
                 {item.maxPurchases && <p className="flex flex-wrap justify-start items-center gap-2"><Square3Stack3DIcon className="size-4 text-blue-400" /> Deținut: {owned}/{item.maxPurchases}</p>}
               </div>
 
