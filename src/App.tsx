@@ -36,7 +36,6 @@ const App: React.FC = () => {
         {/* Right Column: Shop + Log */}
         <div className="space-y-4">
           <section>
-            <h2 className="text-md font-bold text-gray-300 uppercase tracking-wide mb-1">Magazin</h2>
             <ShopPanel />
           </section>
 
