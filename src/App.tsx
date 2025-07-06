@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react'
-import JobList from './components/JobList'
-import SkillList from './components/SkillList'
 import StatsPanel from './components/StatsPanel'
 import PrestigeModal from './components/PrestigeModal'
 import EventLog from './components/EventLog'
 import ShopPanel from './components/ShopPanel'
 import { useGameStore } from './store/useGameStore'
+import SkillsJobsTabs from './components/SkillsJobsTabs'
 
 const App: React.FC = () => {
   const tick = useGameStore(state => state.tick)
@@ -30,13 +29,7 @@ const App: React.FC = () => {
         {/* Left Column: Skills + Jobs */}
         <div className="space-y-4">
           <section>
-            <h2 className="text-md font-bold text-gray-300 uppercase tracking-wide mb-1">Abilități</h2>
-            <SkillList />
-          </section>
-
-          <section>
-            <h2 className="text-md font-bold text-gray-300 uppercase tracking-wide mb-1">Locuri de muncă</h2>
-            <JobList />
+            <SkillsJobsTabs />
           </section>
         </div>
 

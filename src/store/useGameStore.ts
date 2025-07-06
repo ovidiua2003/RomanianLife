@@ -22,7 +22,8 @@ type Job = {
   id: string
   name: string
   category: string
-  income: number
+  income: number,
+  incomePerTick?: number
   xpPerSecond: number
   isWorking: boolean
   isUnlocked: boolean
@@ -159,6 +160,8 @@ export const useGameStore = create<GameState>((set, get) => {
           const incomeBoost = 1 + (newLevel - 1) * 0.05
           const jobIncome = job.income * incomeBoost
           income += jobIncome
+
+          job.incomePerTick = income
 
           money += income - expenses
           totalXP += job.xpPerSecond * xpBoost * skillMultiplier

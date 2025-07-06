@@ -14,8 +14,8 @@ const SkillList: React.FC = () => {
   }, {} as Record<string, typeof skills>)
 
   return (
-    <div className="bg-white p-4 rounded shadow border-l-4 border-green-500">
-      <h2 className="text-xl font-semibold mb-2">Abilități</h2>
+    <div className="rounded shadow">
+      {/* <h2 className="text-xl font-semibold mb-2">Abilități</h2> */}
       {Object.entries(grouped).sort().map(([category, skills]) => (
         <div key={category} className="mb-4">
           <h3 className="text-md font-bold mb-1">
@@ -29,24 +29,24 @@ const SkillList: React.FC = () => {
               const progress = ((skill.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100
               
               return (
-                <li key={skill.id} className="relative h-8 rounded overflow-hidden text-xs text-white">
-                  <div className="absolute top-0 left-0 h-full w-full bg-gray-200" />
+                <li key={skill.id} className="relative h-6 rounded overflow-hidden text-sm text-white">
+                  <div className="absolute top-0 left-0 h-full w-full bg-gray-700" />
                   <div
-                    className="absolute top-0 left-0 h-full bg-green-600 ttransition-[width] duration-500 ease-in"
+                    className="absolute top-0 left-0 h-full bg-green-800 ttransition-[width] duration-500 ease-in"
                     style={{
                       width: `${progress}%`,
                       opacity: skill.isUnlocked ? 1 : 0.4
                     }}
                   />
-                  <div className="relative z-10 px-2 h-full flex items-center justify-between">
-                    <span className="truncate text-gray-800">
-                      {skill.name} • Nivel {skill.level} • XP: {skill.xp.toFixed(1)} / {nextLevelXP.toFixed(1)}
+                  <div className="relative z-10 px-2 pr-0 h-full flex items-center justify-between">
+                    <span className="truncate text-white/50">
+                      <span className="text-white/75">{skill.name}</span> • Nivel {skill.level} • XP: {skill.xp.toFixed(1)} / {nextLevelXP.toFixed(1)}
                     </span>
                     <button
                       onClick={() => skill.isUnlocked && queueSkill(skill.id)}
                       disabled={!skill.isUnlocked}
-                      className={`ml-2 px-2 py-0.5 rounded text-xs ${
-                        skill.isTraining ? 'bg-gray-300 text-black' : 'bg-white text-green-700'
+                      className={`ml-2 px-2 py-0.5 rounded text-sm ${
+                        skill.isTraining ? 'bg-gray-500 text-black' : 'bg-white text-green-800'
                       }`}
                     >
                       {skill.isTraining ? 'Activ' : 'Învață'}
