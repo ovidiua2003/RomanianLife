@@ -1,6 +1,7 @@
 import React from 'react'
 import { useGameStore } from '../store/useGameStore'
 import { categoryMeta } from '../data/categories'
+import { getLevelFromXP, getXPForLevel } from '../util/xp'
 
 const JobList: React.FC = () => {
   const jobs = useGameStore(state => state.jobs)
@@ -21,38 +22,42 @@ const JobList: React.FC = () => {
           <h3 className="text-md font-bold mb-1">
             {categoryMeta[category]?.icon || '💼'} {categoryMeta[category]?.label || category}
           </h3>
-          <ul className="text-sm space-y-2">
+          <ul className="text-sm space-y-1">
             {jobs.map(job => {
-              const jobProgress = (job.xp % 10) * 10
+              const level = getLevelFromXP(job.xp)
+              const currentLevelXP = getXPForLevel(level)
+              const nextLevelXP = getXPForLevel(level + 1)
+              const progress = ((job.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100
               
               return (
-                <li key={job.id} className={`p-2 rounded ${!job.isUnlocked ? 'opacity-50' : ''}`}>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-medium">{job.name}</p>
-                      <p className="text-xs text-gray-500">
-                        {job.income.toFixed(0)} RON/zi • Nivel: {job.level} • XP: {job.xp.toFixed(1)}<br />
-                        Necesită {skills.find(s => s.id === job.requiredSkill)?.name || job.requiredSkill} lvl {job.requiredLevel}
-                      </p>
+                <li
+                  key={job.id}
+                  className={`relative h-8 rounded overflow-hidden text-xs text-white ${
+                    !job.isUnlocked ? 'opacity-50' : ''
+                  }`}
+                >
+                  <div className="absolute top-0 left-0 h-full w-full bg-gray-200" />
+                  {/* Progress bar background */}
+                  <div
+                    className="absolute top-0 left-0 h-full bg-blue-500 transition-[width] duration-500 ease-in"
+                    style={{ width: `${progress}%` }}
+                  />
+
+                  {/* Foreground content */}
+                  <div className="relative z-10 px-2 h-full flex items-center justify-between">
+                    <div className="truncate text-gray-800">
+                      <span className="font-medium">{job.name}</span> • Nivel {job.level} • XP: {job.xp.toFixed(1)} / {nextLevelXP.toFixed(1)} • {job.income.toFixed(0)} RON/zi
                     </div>
                     <button
-                      className={`px-2 py-1 rounded text-xs ${
-                        job.isWorking ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
-                      } text-white`}
+                      className={`ml-2 px-2 py-0.5 rounded text-xs ${
+                        job.isWorking ? 'bg-gray-300 text-black' : 'bg-white text-blue-600'
+                      }`}
                       onClick={() => job.isUnlocked && queueJob(job.id)}
                       disabled={!job.isUnlocked}
                     >
                       {job.isWorking ? 'Activ' : 'Lucrează'}
                     </button>
                   </div>
-                  {job.isWorking && (
-                    <div className="w-full bg-gray-200 h-2 mt-1 rounded">
-                      <div
-                        className="bg-blue-500 h-2 rounded transition-all duration-300"
-                        style={{ width: `${jobProgress}%` }}
-                      />
-                    </div>
-                  )}
                 </li>
               )}
             )}

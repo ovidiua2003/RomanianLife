@@ -1,6 +1,7 @@
 import React from 'react'
 import { useGameStore } from '../store/useGameStore'
 import { categoryMeta } from '../data/categories'
+import { getLevelFromXP, getXPForLevel } from '../util/xp'
 
 const SkillList: React.FC = () => {
   const skills = useGameStore(state => state.skills)
@@ -20,36 +21,37 @@ const SkillList: React.FC = () => {
           <h3 className="text-md font-bold mb-1">
             {categoryMeta[category]?.icon || '💼'} {categoryMeta[category]?.label || category}
           </h3>
-          <ul className="text-sm space-y-2">
+          <ul className="text-sm space-y-1">
             {skills.map(skill => {
-              const progress = (skill.xp % 10) * 10
+              const level = getLevelFromXP(skill.xp)
+              const currentLevelXP = getXPForLevel(level)
+              const nextLevelXP = getXPForLevel(level + 1)
+              const progress = ((skill.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100
+              
               return (
-                <li key={skill.id} className={`p-2 rounded ${!skill.isUnlocked ? 'opacity-50' : ''}`}>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-medium">{skill.name}</p>
-                      <p className="text-xs text-gray-500">
-                        Nivel: {skill.level} | XP: {skill.xp.toFixed(1)}
-                      </p>
-                    </div>
+                <li key={skill.id} className="relative h-8 rounded overflow-hidden text-xs text-white">
+                  <div className="absolute top-0 left-0 h-full w-full bg-gray-200" />
+                  <div
+                    className="absolute top-0 left-0 h-full bg-green-600 ttransition-[width] duration-500 ease-in"
+                    style={{
+                      width: `${progress}%`,
+                      opacity: skill.isUnlocked ? 1 : 0.4
+                    }}
+                  />
+                  <div className="relative z-10 px-2 h-full flex items-center justify-between">
+                    <span className="truncate text-gray-800">
+                      {skill.name} • Nivel {skill.level} • XP: {skill.xp.toFixed(1)} / {nextLevelXP.toFixed(1)}
+                    </span>
                     <button
-                      className={`px-2 py-1 rounded text-xs ${
-                        skill.isTraining ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'
-                      } text-white`}
                       onClick={() => skill.isUnlocked && queueSkill(skill.id)}
                       disabled={!skill.isUnlocked}
+                      className={`ml-2 px-2 py-0.5 rounded text-xs ${
+                        skill.isTraining ? 'bg-gray-300 text-black' : 'bg-white text-green-700'
+                      }`}
                     >
-                      {skill.isTraining ? 'Se învață...' : 'Învață'}
+                      {skill.isTraining ? 'Activ' : 'Învață'}
                     </button>
                   </div>
-                  {skill.isTraining && (
-                    <div className="w-full bg-gray-200 h-2 mt-1 rounded">
-                      <div
-                        className="bg-green-500 h-2 rounded transition-all duration-300"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                  )}
                 </li>
               )
             })}

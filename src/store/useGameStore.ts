@@ -3,6 +3,7 @@ import { jobsData } from '../data/jobs'
 import { skillsData } from '../data/skills'
 import { events } from '../data/events'
 import { shopItems } from '../data/shop'
+import { getXPForLevel } from '../util/xp'
 
 const STORAGE_KEY = 'progress-romania-save'
 
@@ -150,9 +151,13 @@ export const useGameStore = create<GameState>((set, get) => {
           const skillMultiplier = 1 + (skillLevel - 1) * 0.5
 
           const newXP = job.xp + job.xpPerSecond * xpBoost * skillMultiplier
-          const newLevel = Math.floor(newXP / 10) + 1
+          let level = job.level
+          while (newXP >= getXPForLevel(level)) {
+            level += 1
+          }
+          const newLevel = level;
           const incomeBoost = 1 + (newLevel - 1) * 0.05
-          const jobIncome = (job.income / 10) * incomeBoost
+          const jobIncome = job.income * incomeBoost
           income += jobIncome
 
           money += income - expenses
@@ -169,8 +174,11 @@ export const useGameStore = create<GameState>((set, get) => {
       skills = skills.map(skill => {
         if (skill.isTraining && skill.isUnlocked) {
           const newXP = skill.xp + skill.xpPerSecond * xpBoost
-          const newLevel = Math.floor(newXP / 10) + 1
-          return { ...skill, xp: newXP, level: newLevel }
+          let level = skill.level
+          while (newXP >= getXPForLevel(level)) {
+            level += 1
+          }
+          return { ...skill, xp: newXP, level: level }
         }
         return skill
       })
