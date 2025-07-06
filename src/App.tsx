@@ -21,26 +21,39 @@ const App: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen p-4 bg-gradient-to-br from-white to-gray-100">
-        <h1 className="text-3xl font-bold text-center text-blue-700 mb-6">
-          Progress România 🇷🇴
-        </h1>
+      <div className="min-h-screen bg-gray-900 text-white font-sans">
+      {/* Sticky Stats Bar */}
+      <StatsPanel />
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Sidebar */}
-          <div className="space-y-4">
-            <StatsPanel />
-            <ShopPanel />
-            <EventLog />
-          </div>
-
-          {/* Main content: Jobs and Skills */}
-          <div className="md:col-span-3 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <JobList />
+      {/* Main Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+        {/* Left Column: Skills + Jobs */}
+        <div className="space-y-4">
+          <section>
+            <h2 className="text-md font-bold text-gray-300 uppercase tracking-wide mb-1">Abilități</h2>
             <SkillList />
-          </div>
+          </section>
+
+          <section>
+            <h2 className="text-md font-bold text-gray-300 uppercase tracking-wide mb-1">Locuri de muncă</h2>
+            <JobList />
+          </section>
+        </div>
+
+        {/* Right Column: Shop + Log */}
+        <div className="space-y-4">
+          <section>
+            <h2 className="text-md font-bold text-gray-300 uppercase tracking-wide mb-1">Magazin</h2>
+            <ShopPanel />
+          </section>
+
+          <section>
+            <h2 className="text-md font-bold text-gray-300 uppercase tracking-wide mb-1">📜 Jurnal de viață</h2>
+            <EventLog />
+          </section>
         </div>
       </div>
+    </div>
 
       <PrestigeModal />
     </>

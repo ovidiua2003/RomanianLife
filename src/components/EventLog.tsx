@@ -5,13 +5,15 @@ const EventLog: React.FC = () => {
   const log = useGameStore(state => state.eventLog || [])
 
   return (
-    <div className="bg-white p-4 rounded shadow border-l-4 border-purple-500 mt-6">
-      <h2 className="text-xl font-semibold mb-2">Evenimente</h2>
-      <ul className="text-sm space-y-1 max-h-40 overflow-y-auto">
+    <div className="bg-gray-800 p-3 rounded shadow text-sm space-y-2 max-h-64 overflow-y-auto">
+      <h2 className="text-lg font-semibold text-white">📜 Jurnal de viață</h2>
+      <div className="space-y-1">
         {log.map((entry, index) => (
-          <li key={index}>📢 {entry}</li>
+          <p key={index} className="text-gray-300 text-xs leading-snug">
+            {entry}
+          </p>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }
