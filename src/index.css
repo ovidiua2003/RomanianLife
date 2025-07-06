@@ -14,3 +14,7 @@
 .animate-job-progress {
   animation: job-progress 1s linear infinite;
 }
+
+body {
+  @apply bg-background text-white font-sans;
+}

@@ -23,7 +23,7 @@ export const shopItems = [
     name: 'Abonament la sală',
     cost: 400,
     bonus: 0.1,
-    recurringCost: 100,
+    recurringCost: 15,
     category: 'lifestyle',
     resaleValue: 0.4
   },
@@ -115,7 +115,7 @@ export const shopItems = [
     name: 'Mașină second-hand',
     cost: 5000,
     bonus: 0.5,
-    recurringCost: 300,
+    recurringCost: 50,
     category: 'vehicle',
     resaleValue: 0.5
   },
@@ -124,7 +124,7 @@ export const shopItems = [
     name: 'Trotinetă electrică',
     cost: 1800,
     bonus: 0.2,
-    recurringCost: 100,
+    recurringCost: 15,
     category: 'vehicle',
     resaleValue: 0.4
   },
@@ -135,7 +135,7 @@ export const shopItems = [
     name: 'Cățel de companie',
     cost: 3000,
     bonus: 0.3,
-    recurringCost: 150,
+    recurringCost: 5,
     category: 'lifestyle',
     resaleValue: 0.5
   },
@@ -155,7 +155,7 @@ export const shopItems = [
     name: 'Garsonieră în Militari',
     cost: 15000,
     bonus: 1.0,
-    recurringCost: 800,
+    recurringCost: 55,
     category: 'home',
     resaleValue: 0.6
   },
@@ -164,7 +164,7 @@ export const shopItems = [
     name: 'Casă în suburbii',
     cost: 30000,
     bonus: 2.0,
-    recurringCost: 1500,
+    recurringCost: 100,
     category: 'home',
     resaleValue: 0.6
   }
