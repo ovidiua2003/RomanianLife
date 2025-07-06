@@ -8,11 +8,11 @@ import {
 } from '@heroicons/react/24/outline'
 
 const songList = [
-  '/RomaniaGame.mp3',
-  '/DoarLaScoala.mp3',
-  '/FizicaCuantica.mp3',
-  '/LaOrashel.mp3',
-  '/Formulaua1.mp3'
+  './RomaniaGame.mp3',
+  './DoarLaScoala.mp3',
+  './FizicaCuantica.mp3',
+  './LaOrashel.mp3',
+  './Formulaua1.mp3'
 ]
 
 const AudioPlayer = () => {
@@ -71,23 +71,23 @@ const AudioPlayer = () => {
   }, [currentTrack])
 
   return (
-    <div className="flex space-x-1 items-center justify-center">
+    <div className="flex space-x-1 items-center">
       <audio ref={audioRef} preload="auto" />
       <button onClick={handlePrev} className="px-2 py-1">
-        <ArrowLeftEndOnRectangleIcon className="size-8 md:size-6 text-blue-500" />
+        <ArrowLeftEndOnRectangleIcon className="size-6 text-blue-500" />
       </button>
       <button onClick={handlePlayPause} className="px-2 py-1">
         {isPlaying ? (
-          <PauseIcon className="size-8 md:size-6 text-blue-500" />
+          <PauseIcon className="size-6 text-blue-500" />
         ) : (
-          <PlayIcon className="size-8 md:size-6 text-blue-500" />
+          <PlayIcon className="size-6 text-blue-500" />
         )}
       </button>
       <button onClick={handleStop} className="px-2 py-1">
-        <StopIcon className="size-8 md:size-6 text-blue-500" />
+        <StopIcon className="size-6 text-blue-500" />
       </button>
       <button onClick={handleNext} className="px-2 py-1">
-        <ArrowRightEndOnRectangleIcon className="size-8 md:size-6 text-blue-500" />
+        <ArrowRightEndOnRectangleIcon className="size-6 text-blue-500" />
       </button>
     </div>
   )
