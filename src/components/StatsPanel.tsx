@@ -15,6 +15,8 @@ const StatsPanel = () => {
   const resetGame = useGameStore(state => state.reset)
   const prestige = useGameStore(state => state.prestige)
   const canPrestige = useGameStore(state => state.totalXP >= 1000)
+  const isPaused = useGameStore(state => state.isPaused)
+  const togglePause = useGameStore(state => state.togglePause)
 
   return (
     <div className="sticky top-0 z-50 bg-gray-800 p-3 rounded shadow text-sm flex flex-wrap justify-between items-center gap-4">
@@ -32,6 +34,14 @@ const StatsPanel = () => {
         <h1 className="text-2xl font-serif text-right">{gameTitle} <span className="text-sm text-white/50">ver. {gameVersion}</span></h1>
         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0 ml-auto">
           <AudioPlayer />
+          <button
+            onClick={togglePause}
+            className={`px-2 py-1 rounded text-sm text-white ${
+              isPaused ? 'bg-green-600 hover:bg-green-700' : 'bg-orange-500 hover:bg-orange-600'
+            } text-black`}
+          >
+            {isPaused ? 'Continuă Joc' : 'Pauză Joc'}
+          </button>
           <button
             onClick={() => {
               if (confirm('Ești sigur că vrei să resetezi progresul?')) resetGame()

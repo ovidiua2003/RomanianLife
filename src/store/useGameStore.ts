@@ -3,7 +3,8 @@ import { jobsData } from '../data/jobs'
 import { skillsData } from '../data/skills'
 import { events } from '../data/events'
 import { shopItems } from '../data/shop'
-import { getXPForLevel } from '../util/xp'
+import { getLevelFromXP, getXPForLevel } from '../util/xp'
+import { formatAge } from '../util/format'
 
 const STORAGE_KEY = 'progress-romania-save'
 
@@ -44,6 +45,11 @@ type ShopItem = {
   resaleValue?: number // e.g. 0.5 = 50% refund
 }
 
+type LogEntry = {
+  message: string
+  age: string
+}
+
 type GameState = {
   money: number
   incomePerTick: number,
@@ -56,7 +62,7 @@ type GameState = {
   prestigeCount: number
   skills: Skill[]
   jobs: Job[]
-  eventLog: string[]
+  eventLog: LogEntry[]
   happinessMultiplier: number
   purchasedItems: Record<string, number>
   buyItem: (id: string) => void
@@ -68,6 +74,8 @@ type GameState = {
   save: () => void
   load: () => void
   reset: () => void
+  isPaused: boolean
+  togglePause: () => void
 }
 
 export const useGameStore = create<GameState>((set, get) => {
@@ -84,7 +92,10 @@ export const useGameStore = create<GameState>((set, get) => {
     skills: skillsData,
     jobs: jobsData,
     happinessMultiplier: 1,
-    purchasedItems: []
+    purchasedItems: [],
+    eventLog: [],
+    isPaused: false,
+    togglePause: () => set(state => ({ isPaused: !state.isPaused }))
   }
 
   const save = () => {
@@ -108,6 +119,9 @@ export const useGameStore = create<GameState>((set, get) => {
     ...initialState,
     tick: () => {
       const state = get()
+      const isPaused = state.isPaused
+      if (isPaused) return
+
       let { money, totalXP, skills, jobs, ageYears, ageDays } = state
       const xpBoost = state.xpMultiplier * state.happinessMultiplier
       let income = 0
@@ -156,6 +170,7 @@ export const useGameStore = create<GameState>((set, get) => {
           while (newXP >= getXPForLevel(level)) {
             level += 1
           }
+          const prevLevel = getLevelFromXP(job.xp)
           const newLevel = level;
           const incomeBoost = 1 + (newLevel - 1) * 0.05
           const jobIncome = job.income * incomeBoost
@@ -168,6 +183,14 @@ export const useGameStore = create<GameState>((set, get) => {
 
           job.xp = newXP
           job.level = newLevel
+
+          const msgExists = state.eventLog.find(log => log.message === `Ai atins nivelul ${newLevel} ca ${job.name}.`)
+          if (!msgExists && newLevel > prevLevel) {
+            state.eventLog.push({
+              message: `Ai atins nivelul ${newLevel} ca ${job.name}.`,
+              age: formatAge(state.ageYears, state.ageDays)
+            })
+          }
         }
         
         return job
@@ -181,6 +204,14 @@ export const useGameStore = create<GameState>((set, get) => {
           while (newXP >= getXPForLevel(level)) {
             level += 1
           }
+          const prevLevel = getLevelFromXP(skill.xp)
+          const msgExists = state.eventLog.find(log => log.message === `Ai atins nivelul ${level} în ${skill.name}.`)
+          if (!msgExists && level > prevLevel) {
+            state.eventLog.push({
+              message: `Ai atins nivelul ${level} în ${skill.name}.`,
+              age: formatAge(state.ageYears, state.ageDays)
+            })
+          }
           return { ...skill, xp: newXP, level: level }
         }
         return skill
@@ -190,30 +221,63 @@ export const useGameStore = create<GameState>((set, get) => {
       if (Math.random() < 0.05) {
         const event = events[Math.floor(Math.random() * events.length)]
         const log = get().eventLog || []
-        set({ eventLog: [...log.slice(-9), event.text] })
+        
+        set({ eventLog: [...log, {
+          message: event.text,
+          age: formatAge(state.ageYears, state.ageDays)
+        }] })
       }
 
       set({ money, incomePerTick: income, expensesPerTick: expenses, totalXP, skills, jobs, ageYears, ageDays })
       state.save()
     },
     queueSkill: (id: string) => {
-      set(state => ({
-        skills: state.skills.map(skill =>
-          skill.id === id
-            ? { ...skill, isTraining: true }
-            : { ...skill, isTraining: false }
-        )
-      }))
+      set(state => {
+        const currentSkill = state.skills.find(skill => skill.isTraining === true)
+        const newSkill = state.skills.find(skill => skill.id === id)
+
+        // Only log if the skill is actually changing
+        if (newSkill && currentSkill?.id !== newSkill.id) {
+          const msg = {
+            message: `Ai început să te antrenezi în ${newSkill.name}.`,
+            age: formatAge(state.ageYears, state.ageDays)
+          }
+
+          set({ eventLog: [...state.eventLog, msg] })
+        }
+        
+        return {
+          skills: state.skills.map(skill =>
+            skill.id === id
+              ? { ...skill, isTraining: true }
+              : { ...skill, isTraining: false }
+          )
+        }
+      })
     },
 
     queueJob: (id: string) => {
-      set(state => ({
-        jobs: state.jobs.map(job =>
-          job.id === id
-            ? { ...job, isWorking: true }
-            : { ...job, isWorking: false }
-        )
-      }))
+      set(state => {
+        const currentJob = state.jobs.find(job => job.isWorking)
+        const newJob = state.jobs.find(job => job.id === id)
+
+        // Only log if the job is actually changing
+        if (newJob && currentJob?.id !== newJob.id) {
+          const msg = {
+            message: `Ai început să lucrezi ca ${newJob.name}.`,
+            age: formatAge(state.ageYears, state.ageDays)
+          }
+          set({ eventLog: [...state.eventLog, msg] })
+        }
+
+        return {
+          jobs: state.jobs.map(job =>
+            job.id === id
+              ? { ...job, isWorking: true }
+              : { ...job, isWorking: false }
+          )
+        }
+      })
     },
     prestige: () => {
       const state = get()
@@ -247,7 +311,7 @@ export const useGameStore = create<GameState>((set, get) => {
         jobs: resetJobs,
         prestigeCount: state.prestigeCount + 1,
         xpMultiplier: 1 + (state.prestigeCount + 1) * 0.25,
-        eventLog: [`Ai renăscut! Bonus XP: x${(1 + (state.prestigeCount + 1) * 0.25).toFixed(2)}`]
+        eventLog: [{message: `Ai renăscut! Bonus XP: x${(1 + (state.prestigeCount + 1) * 0.25).toFixed(2)}`, age: formatAge(state.ageYears, state.ageDays)}]
       })
     },
     save,
@@ -288,13 +352,19 @@ export const useGameStore = create<GameState>((set, get) => {
 
       if (state.money < item.cost || !isRepeatable || categoryConflict) return
 
+      const logMsg = {
+        message: `Ai cumpărat un ${item.name}.`,
+        age: formatAge(state.ageYears, state.ageDays)
+      }
+
       set({
         money: state.money - item.cost,
         happinessMultiplier: state.happinessMultiplier + item.bonus,
         purchasedItems: {
           ...state.purchasedItems,
           [id]: owned + 1
-        }
+        },
+        eventLog: [...state.eventLog, logMsg]
       })
     },
     sellItem: (id) => {
@@ -306,13 +376,19 @@ export const useGameStore = create<GameState>((set, get) => {
       const refund = item.cost * item.resaleValue
       const newQty = owned - 1
 
+      const logMsg = {
+        message: `Ai vândut un ${item.name} pentru ${item.resaleValue} RON.`,
+        age: formatAge(state.ageYears, state.ageDays)
+      }
+
       set({
         money: state.money + refund,
         happinessMultiplier: state.happinessMultiplier - item.bonus,
         purchasedItems: {
           ...state.purchasedItems,
           [id]: newQty
-        }
+        },
+        eventLog: [...state.eventLog, logMsg]
       })
     }
   }

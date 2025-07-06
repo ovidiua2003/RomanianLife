@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import SkillList from './SkillList'
 import JobList from './JobList'
+import LifeTimeline from './LifeTimeline'
 
 const SkillsJobsTabs = () => {
-  const [activeTab, setActiveTab] = useState<'skills' | 'jobs'>('skills')
+  const [activeTab, setActiveTab] = useState<'skills' | 'jobs' | 'graph'>('skills')
 
   return (
     <div className="bg-gray-800 p-3 rounded shadow">
@@ -28,9 +29,30 @@ const SkillsJobsTabs = () => {
         >
           Locuri de muncă
         </button>
+        <button
+          onClick={() => setActiveTab('graph')}
+          className={`px-3 py-1 rounded text-sm font-semibold ${
+            activeTab === 'graph'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          Grafic Viață
+        </button>
       </div>
 
-      {activeTab === 'skills' ? <SkillList /> : <JobList />}
+      {(() => {
+        switch (activeTab) {
+          case 'skills':
+            return <SkillList />
+          case 'jobs':
+            return <JobList />
+          case 'graph':
+            return <LifeTimeline />
+          default:
+            return null
+        }
+      })()}
     </div>
   )
 }

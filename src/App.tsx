@@ -40,7 +40,6 @@ const App: React.FC = () => {
           </section>
 
           <section>
-            <h2 className="text-md font-bold text-gray-300 uppercase tracking-wide mb-1">📜 Jurnal de viață</h2>
             <EventLog />
           </section>
         </div>
