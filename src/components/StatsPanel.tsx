@@ -20,19 +20,19 @@ const StatsPanel = () => {
 
   return (
     <div className="sticky top-0 z-50 bg-gray-800 p-3 rounded shadow text-sm flex flex-wrap justify-between items-center gap-4">
-      <ul className="space-y-0.5 text-white text-sm grid grid-cols-4 justify-items-start items-center gap-x-4 gap-y-2">
-        <li className="flex flex-wrap justify-between items-center gap-2"><BanknotesIcon className="size-6 text-white-500" /> Avere: {money.toFixed(2)} RON</li>
-        <li className="flex flex-wrap justify-between items-center gap-2"><ArrowTrendingUpIcon className="size-6 text-white-500" /> Salariu: {incomePerTick.toFixed(0)} RON / zi</li>
-        <li className="flex flex-wrap justify-between items-center gap-2"><ArrowTrendingDownIcon className="size-6 text-white-500" /> Cheltuieli: {expensesPerTick.toFixed(0)} RON / zi</li>
-        <li className="flex flex-wrap justify-between items-center gap-2"><LightBulbIcon className="size-6 text-white-500" /> XP Total: {totalXP.toFixed(1)}</li>
-        <li className="flex flex-wrap justify-between items-center gap-2"><IdentificationIcon className="size-6 text-white-500" /> Vârstă: {ageYears} ani și {ageDays} zile</li>
-        <li className="flex flex-wrap justify-between items-center gap-2"><BoltIcon className="size-6 text-white-500" /> Energie: {energy}%</li>
-        <li className="flex flex-wrap justify-between items-center gap-2"><ArrowPathIcon className="size-6 text-white-500" /> Reîncarnări: {prestigeCount}</li>
+      <ul className="space-y-0.5 text-white text-sm grid grid-cols-2 md:grid-cols-4 justify-items-start items-center gap-x-4 md:gap-y-2 order-2 md:order-1">
+        <li className="flex flex-wrap justify-between items-center gap-2"><BanknotesIcon className="size-4 md:size-6 text-white-500" /> Avere: {money.toFixed(2)} RON</li>
+        <li className="flex flex-wrap justify-between items-center gap-2"><ArrowTrendingUpIcon className="size-4 md:size-6 text-white-500" /> Salariu: {incomePerTick.toFixed(0)} RON / zi</li>
+        <li className="flex flex-wrap justify-between items-center gap-2"><ArrowTrendingDownIcon className="size-4 md:size-6 text-white-500" /> Cheltuieli: {expensesPerTick.toFixed(0)} RON / zi</li>
+        <li className="flex flex-wrap justify-between items-center gap-2"><LightBulbIcon className="size-4 md:size-6 text-white-500" /> XP Total: {totalXP.toFixed(1)}</li>
+        <li className="flex flex-wrap justify-between items-center gap-2"><IdentificationIcon className="size-4 md:size-6 text-white-500" /> Vârstă: {ageYears} ani și {ageDays} zile</li>
+        <li className="flex flex-wrap justify-between items-center gap-2"><BoltIcon className="size-4 md:size-6 text-white-500" /> Energie: {energy}%</li>
+        <li className="flex flex-wrap justify-between items-center gap-2"><ArrowPathIcon className="size-4 md:size-6 text-white-500" /> Reîncarnări: {prestigeCount}</li>
       </ul>
 
-      <div className="flex flex-col">
-        <h1 className="text-2xl font-serif text-right">{gameTitle} <span className="text-sm text-white/50">ver. {gameVersion}</span></h1>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0 ml-auto">
+      <div className="flex flex-col order-1 md:order-2 w-full md:w-auto">
+        <h1 className="text-2xl font-serif text-center md:text-right">{gameTitle} <span className="text-sm text-white/50">ver. {gameVersion}</span></h1>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0 ml-auto w-full md:w-auto">
           <AudioPlayer />
           <button
             onClick={togglePause}

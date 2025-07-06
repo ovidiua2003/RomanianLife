@@ -1,89 +1,93 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowLeftEndOnRectangleIcon, ArrowRightEndOnRectangleIcon, PlayIcon, StopIcon, PauseIcon } from '@heroicons/react/24/outline'
+import {
+  ArrowLeftEndOnRectangleIcon,
+  ArrowRightEndOnRectangleIcon,
+  PlayIcon,
+  StopIcon,
+  PauseIcon
+} from '@heroicons/react/24/outline'
 
 const songList = [
-    '/RomaniaGame.mp3',
-    '/DoarLaScoala.mp3',
-    '/FizicaCuantica.mp3',
-    '/LaOrashel.mp3',
-    '/Formulaua1.mp3'
+  '/RomaniaGame.mp3',
+  '/DoarLaScoala.mp3',
+  '/FizicaCuantica.mp3',
+  '/LaOrashel.mp3',
+  '/Formulaua1.mp3'
 ]
 
-
 const AudioPlayer = () => {
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const audioRef = useRef<HTMLAudioElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTrack, setCurrentTrack] = useState(0)
 
-  const loadAndPlay = (index: number) => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-    }
-    const newAudio = new Audio(songList[index])
-    newAudio.loop = false;
-    newAudio.play()
-    audioRef.current = newAudio
-    setIsPlaying(true)
-
-    newAudio.addEventListener('ended', () => {
-        const next = (index + 1) % songList.length
-        setCurrentTrack(next)
-        loadAndPlay(next)
-    })
-  }
-
   const handlePlayPause = () => {
-    if (!audioRef.current) {
-      loadAndPlay(currentTrack)
-    } else if (audioRef.current.paused) {
-      audioRef.current.play()
-      setIsPlaying(true)
+    const audio = audioRef.current
+    if (!audio) return
+
+    if (audio.paused) {
+      audio.play().then(() => setIsPlaying(true)).catch(err => {
+        console.warn('Playback failed:', err)
+      })
     } else {
-      audioRef.current.pause()
+      audio.pause()
       setIsPlaying(false)
     }
   }
 
   const handleStop = () => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.currentTime = 0
-    }
+    const audio = audioRef.current
+    if (!audio) return
+    audio.pause()
+    audio.currentTime = 0
     setIsPlaying(false)
   }
 
   const handleNext = () => {
     const next = (currentTrack + 1) % songList.length
     setCurrentTrack(next)
-    loadAndPlay(next)
   }
 
   const handlePrev = () => {
     const prev = (currentTrack - 1 + songList.length) % songList.length
     setCurrentTrack(prev)
-    loadAndPlay(prev)
   }
 
   useEffect(() => {
-    return () => {
-      audioRef.current?.pause()
+    const audio = audioRef.current
+    if (!audio) return
+
+    audio.src = songList[currentTrack]
+    audio.load()
+
+    const handleEnded = () => {
+      const next = (currentTrack + 1) % songList.length
+      setCurrentTrack(next)
     }
-  }, [])
+
+    audio.addEventListener('ended', handleEnded)
+    return () => {
+      audio.removeEventListener('ended', handleEnded)
+    }
+  }, [currentTrack])
 
   return (
-    <div className="flex space-x-1">
-        
+    <div className="flex space-x-1 items-center justify-center">
+      <audio ref={audioRef} preload="auto" />
       <button onClick={handlePrev} className="px-2 py-1">
-        <ArrowLeftEndOnRectangleIcon className="size-6 text-blue-500" />
+        <ArrowLeftEndOnRectangleIcon className="size-8 md:size-6 text-blue-500" />
       </button>
       <button onClick={handlePlayPause} className="px-2 py-1">
-        {isPlaying ? (<PauseIcon className="size-6 text-blue-500" />) : (<PlayIcon className="size-6 text-blue-500" />)}
+        {isPlaying ? (
+          <PauseIcon className="size-8 md:size-6 text-blue-500" />
+        ) : (
+          <PlayIcon className="size-8 md:size-6 text-blue-500" />
+        )}
       </button>
       <button onClick={handleStop} className="px-2 py-1">
-        <StopIcon className="size-6 text-blue-500" />
+        <StopIcon className="size-8 md:size-6 text-blue-500" />
       </button>
       <button onClick={handleNext} className="px-2 py-1">
-        <ArrowRightEndOnRectangleIcon className="size-6 text-blue-500" />
+        <ArrowRightEndOnRectangleIcon className="size-8 md:size-6 text-blue-500" />
       </button>
     </div>
   )

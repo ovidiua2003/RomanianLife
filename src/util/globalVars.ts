@@ -1,2 +1,2 @@
 export const gameTitle = "Progres Românesc"
-export const gameVersion = "1.0.0"
+export const gameVersion = "1.1.0"
