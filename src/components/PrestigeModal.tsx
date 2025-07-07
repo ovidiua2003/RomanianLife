@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useGameStore } from '../store/useGameStore'
+import { prestigeLimit } from '../util/globalVars'
 
 const PrestigeModal: React.FC = () => {
   const prestige = useGameStore(state => state.prestige)
@@ -9,16 +10,16 @@ const PrestigeModal: React.FC = () => {
 
   const [open, setOpen] = useState(false)
 
-  const canPrestige = totalXP >= 1000
+  const canPrestige = useGameStore(state => state.totalXP >= prestigeLimit)
 
   return (
     <>
       {canPrestige && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-4 right-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow-lg z-50"
+          className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-sm"
         >
-          🔁 Prestigiu
+          Reîncarnare
         </button>
       )}
 
@@ -27,10 +28,10 @@ const PrestigeModal: React.FC = () => {
           <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
             <h2 className="text-xl font-bold mb-2">🔁 Prestigiu</h2>
             <p className="text-sm mb-4">
-              Ești gata să o iei de la capăt? Vei pierde toată progresia, dar vei primi un bonus permanent de XP.
+              Ești gata să o iei de la capăt? Vei pierde tot progresul, dar vei primi un bonus permanent de XP.
             </p>
             <ul className="text-sm mb-4 list-disc list-inside text-gray-700">
-              <li>Prestigii actuale: {prestigeCount}</li>
+              <li>Reîncarnări actuale: {prestigeCount}</li>
               <li>Bonus XP: x{xpMultiplier.toFixed(2)}</li>
               <li>Următorul bonus: x{(xpMultiplier + 0.25).toFixed(2)}</li>
             </ul>
@@ -48,7 +49,7 @@ const PrestigeModal: React.FC = () => {
                 }}
                 className="px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded"
               >
-                Confirmă Prestigiul
+                Confirmă
               </button>
             </div>
           </div>

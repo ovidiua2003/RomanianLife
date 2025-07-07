@@ -2,6 +2,7 @@ import { useGameStore } from '../store/useGameStore'
 import { gameTitle, gameVersion } from '../util/globalVars'
 import AudioPlayer from './AudioPlayer'
 import { BanknotesIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, IdentificationIcon, LightBulbIcon, ArrowPathIcon, BoltIcon } from '@heroicons/react/24/outline'
+import PrestigeModal from './PrestigeModal'
 
 const StatsPanel = () => {
   const money = useGameStore(state => state.money)
@@ -13,8 +14,6 @@ const StatsPanel = () => {
   const energy = useGameStore(state => state.energy)
   const prestigeCount = useGameStore(state => state.prestigeCount)
   const resetGame = useGameStore(state => state.reset)
-  const prestige = useGameStore(state => state.prestige)
-  const canPrestige = useGameStore(state => state.totalXP >= 1000)
   const isPaused = useGameStore(state => state.isPaused)
   const togglePause = useGameStore(state => state.togglePause)
 
@@ -50,13 +49,7 @@ const StatsPanel = () => {
           >
             Resetare
           </button>
-          <button
-            onClick={prestige}
-            disabled={!canPrestige}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-sm"
-          >
-            Reîncarnare
-          </button>
+          <PrestigeModal />
         </div>
       </div>
     </div>
